@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择实验组</title>
+    <style>
+        /* 统一的现代风格变量 */
+        :root {
+            --primary-color: #4c51bf; /* 主色：柔和的靛蓝色 */
+            --primary-light: #667eea;
+            --bg-page: #f4f6f9; /* 页面背景：浅灰蓝 */
+            --bg-card: #ffffff; /* 卡片背景：白色 */
+            --text-dark: #333333;
+            --text-medium: #666666;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            --font-clean: 'Segoe UI', system-ui, sans-serif, 'Microsoft YaHei';
+        }
+
+        /* 全局重置与基础设置 */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: var(--font-clean);
+            background-color: var(--bg-page); /* 浅色背景 */
+            color: var(--text-dark); /* 深色文本 */
+            line-height: 1.6;
+        }
+
+        /* 全屏居中布局 */
+        .full-height {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-page);
+            padding: 25px;
+        }
+
+        .center-container {
+            width: 100%;
+            max-width: 550px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* 卡片基础样式 */
+        .card-section {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* 柔和的阴影 */
+        }
+
+        /* 学号信息面板 */
+        .student-info {
+            background-color: var(--primary-light);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(76, 81, 191, 0.3);
+        }
+        .student-info h4 {
+            color: white;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .student-info p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        /* 主容器 - 实验组选择 */
+        .group-container {
+            /* 继承 card-section 样式 */
+        }
+
+        /* 头部标题 */
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-bottom: 3px solid var(--primary-light);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .header p {
+            color: var(--text-medium);
+            font-size: 16px;
+        }
+
+        /* 实验组列表 */
+        .group-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .group-list li {
+            margin: 15px 0;
+        }
+
+        /* 实验组链接按钮 */
+        .group-list a {
+            display: block;
+            padding: 18px 30px;
+            background: var(--bg-page); /* 浅灰背景 */
+            color: var(--primary-color);
+            text-decoration: none;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            letter-spacing: 0.5px;
+        }
+
+        .group-list a:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+            color: white; /* 悬停时颜色更亮 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 81, 191, 0.3);
+            text-decoration: none;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .center-container {
+                padding: 10px;
+            }
+
+            .card-section {
+                padding: 20px;
+            }
+
+            .group-list a {
+                padding: 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body class="full-height">
+    <div class="center-container">
+        <div class="student-info">
+            <h4>当前学号：{{ student_id }}</h4>
+            <p class="mb-0">您的所有录音都将以此学号作为标识</p>
+        </div>
+
+        <div class="card-section group-container">
+            <div class="header">
+                <h1>选择实验组</h1>
+                <p>请选择一个实验组开始：</p>
+            </div>
+
+            <ul class="group-list">
+                {% for group in groups %}
+                <li>
+                    <a href="{{ url_for('start_group', group=group) }}">
+                        实验组 {{ loop.index }} - {{ group }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            </div>
+    </div>
+</body>
+</html>

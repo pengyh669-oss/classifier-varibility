@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>逻辑回归分析结果</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .report-content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .plot-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .plot-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .actions {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>多项逻辑回归分析结果</h1>
+
+    <div class="actions">
+        <a href="{{ url_for('results') }}" class="btn">返回分类结果</a>
+        <a href="{{ url_for('index') }}" class="btn">返回首页</a>
+    </div>
+
+    {% if plot_exists %}
+    <div class="plot-container">
+        <img src="{{ url_for('static', filename='../regression_analysis.png') }}" alt="回归分析可视化">
+    </div>
+    {% endif %}
+
+    <div class="report-content">
+        {{ report_content }}
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('results') }}" class="btn">返回分类结果</a>
+        <a href="{{ url_for('index') }}" class="btn">返回首页</a>
+    </div>
+</body>
+</html>

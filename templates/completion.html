@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验完成</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .full-height {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 20px 0;
+        }
+
+        .completion-container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .success-icon {
+            color: #28a745;
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .info-item {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            text-align: left;
+        }
+
+        .highlight {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .btn-container {
+            margin-top: 30px;
+        }
+
+        .btn-restart {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+            padding: 12px 40px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover {
+            background-color: #138496;
+            border-color: #117a8b;
+            color: white;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .card {
+                padding: 25px;
+            }
+
+            .success-icon {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body class="full-height">
+    <div class="completion-container">
+        <div class="card">
+            <div class="success-icon">✓</div>
+            <h1 class="mb-4">实验完成！</h1>
+            <p class="lead mb-4">感谢您参与本次实验！</p>
+
+            <div class="mb-4">
+                <div class="info-item">
+                    <strong>学号：</strong><span class="highlight">{{ student_id }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>完成组别：</strong>{{ group }}
+                </div>
+                <div class="info-item">
+                    <strong>录音文件数：</strong><span class="highlight">{{ recording_count }}</span> 个
+                </div>
+                <div class="info-item">
+                    <strong>总耗时：</strong><span class="highlight">{{ total_duration }}</span> 秒
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <h5>数据保存说明</h5>
+                <p class="mb-0">
+                    您的录音文件已保存，文件名格式为：<br>
+                    <code>{{ student_id }}_组别_图片ID_时间戳.mp3</code><br>
+                    学号已作为录音文件名的标识部分。
+                </p>
+            </div>
+
+            <div class="btn-container">
+                <a href="{{ url_for('restart') }}" class="btn btn-restart">
+                    重新开始实验
+                </a>
+                <p class="text-muted mt-3">点击上方按钮将清除当前学号，返回到学号输入页面</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

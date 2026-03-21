@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验规则与说明</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --dark-bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --glow-color: rgba(102, 126, 234, 0.4);
+            --neon-border: #00d4ff;
+        }
+
+        body {
+            background: var(--dark-bg);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 20%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(90deg, transparent 1px, transparent 1px),
+                linear-gradient(transparent 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        .full-height {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .rules-container {
+            max-width: 900px;
+            width: 100%;
+            animation: floatIn 0.8s ease-out;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .student-id-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .student-id-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .student-id-section:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 30px var(--glow-color),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .rules-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rules-section::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .rules-section > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        h1, h3, h4 {
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 3px;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            padding-left: 20px;
+            border-left: 4px solid var(--neon-border);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        p, li {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 12px 0 12px 40px;
+            position: relative;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            color: #fff;
+            transform: translateX(10px);
+        }
+
+        li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: var(--neon-border);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        li:hover::before {
+            transform: scale(1.5);
+        }
+
+        .form-control {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.2rem;
+            padding: 20px;
+            height: auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-control:focus {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: var(--neon-border);
+            box-shadow:
+                0 0 0 3px rgba(0, 212, 255, 0.2),
+                0 10px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .btn-success, .btn-primary, .btn-restart {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success::before, .btn-primary::before, .btn-restart::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-success:hover::before, .btn-primary:hover::before, .btn-restart:hover::before {
+            left: 100%;
+        }
+
+        .btn-success:hover, .btn-primary:hover, .btn-restart:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow:
+                0 15px 30px rgba(102, 126, 234, 0.4),
+                0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary {
+            background: var(--secondary-gradient);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
+        }
+
+        .error-message, .warning-message, .success-message {
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid transparent;
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(220, 53, 69, 0.1) 100%);
+            border-color: #dc3545;
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.2);
+        }
+
+        .warning-message {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 193, 7, 0.1) 100%);
+            border-color: #ffc107;
+            box-shadow: 0 10px 20px rgba(255, 193, 7, 0.2);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(40, 167, 69, 0.1) 100%);
+            border-color: #28a745;
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
+        }
+
+        .form-text {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-top: 10px;
+            padding-left: 10px;
+            border-left: 2px solid var(--neon-border);
+        }
+
+        /* 粒子背景效果 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(135deg, var(--neon-border), #667eea);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: floatParticle 20s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .rules-section, .student-id-section {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            .btn-success, .btn-primary, .btn-restart {
+                padding: 15px 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <div class="full-height">
+        <div class="container rules-container">
+            <!-- 学号输入部分 -->
+            <div class="student-id-section">
+                <h3 class="text-center mb-4">请输入您的学号</h3>
+
+                {% if error %}
+                <div class="error-message">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                {% if completed_warning %}
+                <div class="warning-message">
+                    {{ completed_warning }}
+                    <div class="mt-3">
+                        <a href="{{ url_for('restart') }}" class="btn btn-restart">
+                            重新开始实验
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if show_rules and student_id and not completed_warning %}
+                <div class="success-message">
+                    <strong>✓ 学号已验证：{{ student_id }}</strong><br>
+                    您的录音将以该学号作为标识
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('rules') }}">
+                    <div class="form-group">
+                        <label for="student_id"><strong>学号：</strong></label>
+                        <input type="text"
+                               id="student_id"
+                               name="student_id"
+                               class="form-control form-control-lg"
+                               placeholder="请输入10位数字学号"
+                               required
+                               pattern="\d{10}"
+                               title="请输入10位数字学号"
+                               value="{{ student_id if student_id else '' }}"
+                               maxlength="10"
+                               minlength="10">
+                        <small class="form-text text-muted">
+                            请输入您的学号（例如：2025123001）
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block btn-lg mt-3">
+                        {% if show_rules and student_id and not completed_warning %}
+                        重新输入学号
+                        {% else %}
+                        验证学号
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+
+            <!-- 已输入学号后才显示规则部分 -->
+            {% if show_rules and student_id and not completed_warning %}
+            <div class="rules-section">
+                <h1 class="text-center mb-4">实验规则与说明</h1>
+
+                <h3>实验目的</h3>
+                <p>本实验旨在研究在不同提示句下对图片描述内容的区别。</p>
+
+                <h3>实验规则</h3>
+                <ul>
+                    <li>实验包含包含60张图片，你需要根据图片来完成提示句。</li>
+                    <li>回答时点击开始录音，录音结束后点击结束录音。</li>
+                    <li>点击"加载下一张图片"按钮切换到下一张图片。</li>
+                    <li>必须为每张图片提供答案，未回答的图片不能跳过。</li>
+                    <li>进行录音的时候要吐字清楚，声音尽量大点，语速适中。</li>
+                </ul>
+
+                <h3>实验说明</h3>
+                <p>在实验时，你会看见一系列图片以及提示句子，你只需要回答提示句括号中的内容</p>
+                <p>当看见"这是（）"时，你可以在完成句子括号里内容的基础上随意描述；看见类似"这是一个（）"，"这是一（）狗"，你需要回答对应括号中的内容</p>
+
+                <!-- 开始实验按钮 -->
+                <div class="text-center mt-5">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                        选择实验组，开始实验
+                    </a>
+                </div>
+            </div>
+            {% elif not completed_warning %}
+            <div class="rules-section text-center">
+                <h4>请先输入你的学号后再查看实验规则</h4>
+                <p class="text-muted">学号将作为录音的标识符</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // 创建粒子效果
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const size = Math.random() * 10 + 5;
+                const duration = Math.random() * 20 + 20;
+                const delay = Math.random() * 20;
+
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 输入验证
+        document.getElementById('student_id').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+
+        // 表单提交验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var studentId = document.getElementById('student_id').value;
+            if (studentId.length !== 10) {
+                e.preventDefault();
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = '请输入10位数字学号！';
+                errorDiv.style.animation = 'slideDown 0.5s ease-out';
+
+                const form = this;
+                const existingError = form.querySelector('.error-message');
+                if (existingError) existingError.remove();
+
+                form.insertBefore(errorDiv, form.firstChild);
+                return false;
+            }
+        });
+
+        // 初始化粒子效果
+        document.addEventListener('DOMContentLoaded', createParticles);
+
+        // 添加鼠标移动效果
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.student-id-section, .rules-section');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateY = (x - centerX) / 50;
+                const rotateX = (centerY - y) / 50;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+            });
+        });
+    </script>
+</body>
+</html>

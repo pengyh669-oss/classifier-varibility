@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>分类结果</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .message {
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .actions {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-reclassify {
+            background-color: #ffc107;
+            color: black;
+        }
+        .btn-reclassify:hover {
+            background-color: #e0a800;
+        }
+        .results-container {
+            margin-top: 30px;
+        }
+        .result-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .result-key {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .result-answer {
+            margin: 5px 0;
+        }
+        .result-noun {
+            color: #28a745;
+        }
+        .result-category {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>分类结果</h1>
+
+    {% if message %}
+        <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <div class="actions">
+        <a href="{{ url_for('reclassify') }}" class="btn btn-reclassify">重新分类所有答案</a>
+        <a href="{{ url_for('download_results') }}" class="btn">下载分类结果文件</a>
+        <a href="{{ url_for('index') }}" class="btn">返回首页</a>
+    </div>
+
+    <div class="results-container">
+        {% if results %}
+            <h2>分类详情 (共 {{ results|length }} 个答案)</h2>
+            {% for key, result in results.items() %}
+                <div class="result-item">
+                    <div class="result-key">{{ key }}</div>
+                    <div class="result-answer">原始回答: {{ result.original_answer }}</div>
+                    <div class="result-answer">识别出的中心名词: <span class="result-noun">{{ result.identified_noun }}</span></div>
+                    <div class="result-answer">名词层级分类: <span class="result-category">{{ result.category }}</span></div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>暂无分类结果数据</p>
+        {% endif %}
+    </div>
+</body>
+</html>

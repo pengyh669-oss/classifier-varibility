@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片描述录音</title>
+    <style>
+        :root {
+            --bg: #f4f6fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --ok: #059669;
+            --warn: #d97706;
+            --err: #dc2626;
+            --primary: #2563eb;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .progress {
+            color: var(--muted);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .img-box {
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .img-box img {
+            max-width: 100%;
+            max-height: 420px;
+            border-radius: 8px;
+        }
+
+        .prompt {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #startRecording { background: var(--ok); }
+        #stopRecording { background: var(--err); }
+        #nextImageBtn { background: var(--primary); }
+
+        .status {
+            min-height: 24px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .msg {
+            display: none;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 6px;
+            font-weight: 700;
+        }
+
+        .msg.ok { display: block; color: #065f46; background: #d1fae5; }
+        .msg.warn { display: block; color: #92400e; background: #fef3c7; }
+        .msg.err { display: block; color: #991b1b; background: #fee2e2; }
+
+        .done {
+            display: none;
+            margin-top: 12px;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-weight: 700;
+        }
+
+        .countdown {
+            color: var(--err);
+            font-size: 20px;
+            margin: 0 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="progress">当前进度：{{ image_index }} / {{ total_images }}</div>
+
+        <div class="img-box">
+            <img src="{{ image_url }}" alt="实验图片">
+        </div>
+
+        <div class="prompt">{{ prompt }}</div>
+
+        <div class="controls">
+            <button id="startRecording">开始录音</button>
+            <button id="stopRecording" disabled>停止录音</button>
+            <button id="nextImageBtn" onclick="nextImage()" disabled>下一张</button>
+        </div>
+
+        <div class="status" id="recordingStatus">请点击“开始录音”</div>
+        <div class="msg" id="statusMessage"></div>
+
+        <div class="done" id="completionMessage">
+            全部题目已完成，<span class="countdown" id="countdown">3</span> 秒后跳转...
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let questionStartTime = null;
+        let currentQuestionDuration = 0;
+        let countdownTimer = null;
+
+        const startButton = document.getElementById("startRecording");
+        const stopButton = document.getElementById("stopRecording");
+        const nextImageBtn = document.getElementById("nextImageBtn");
+        const recordingStatus = document.getElementById("recordingStatus");
+        const statusMessage = document.getElementById("statusMessage");
+        const completionMessage = document.getElementById("completionMessage");
+        const countdownEl = document.getElementById("countdown");
+
+        function showMessage(text, level) {
+            statusMessage.textContent = text;
+            statusMessage.className = "msg";
+            if (level === "ok") statusMessage.classList.add("ok");
+            if (level === "warn") statusMessage.classList.add("warn");
+            if (level === "err") statusMessage.classList.add("err");
+        }
+
+        function resetUI() {
+            audioChunks = [];
+            isRecording = false;
+            questionStartTime = null;
+            currentQuestionDuration = 0;
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            nextImageBtn.disabled = true;
+            recordingStatus.textContent = "请点击“开始录音”";
+        }
+
+        function startCountdown(seconds, url) {
+            let rest = seconds;
+            completionMessage.style.display = "block";
+            countdownEl.textContent = String(rest);
+
+            countdownTimer = window.setInterval(() => {
+                rest -= 1;
+                countdownEl.textContent = String(rest);
+                if (rest <= 0) {
+                    window.clearInterval(countdownTimer);
+                    window.location.href = url;
+                }
+            }, 1000);
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+            showMessage("当前浏览器不支持录音，请使用最新版 Chrome/Edge。", "err");
+            startButton.disabled = true;
+        }
+
+        startButton.addEventListener("click", async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+
+                let mimeType = "";
+                const candidates = [
+                    "audio/webm;codecs=opus",
+                    "audio/webm",
+                    "audio/mp4"
+                ];
+                for (const type of candidates) {
+                    if (MediaRecorder.isTypeSupported(type)) {
+                        mimeType = type;
+                        break;
+                    }
+                }
+
+                mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data && event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = async () => {
+                    stream.getTracks().forEach((track) => track.stop());
+                    await saveRecording();
+                };
+
+                mediaRecorder.start(200);
+                isRecording = true;
+                questionStartTime = Date.now();
+                currentQuestionDuration = 0;
+
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                recordingStatus.textContent = "录音中...";
+                showMessage("已开始录音，请说话后点击停止。", "warn");
+            } catch (error) {
+                console.error("start recording error:", error);
+                showMessage("无法开始录音。请检查麦克风权限，或确认你在安全环境访问页面。", "err");
+            }
+        });
+
+        stopButton.addEventListener("click", () => {
+            if (!mediaRecorder || !isRecording) return;
+
+            currentQuestionDuration = questionStartTime
+                ? Math.max(0, (Date.now() - questionStartTime) / 1000)
+                : 0;
+
+            questionStartTime = null;
+            isRecording = false;
+            mediaRecorder.stop();
+
+            startButton.disabled = true;
+            stopButton.disabled = true;
+            recordingStatus.textContent = "处理中...";
+            showMessage("正在上传录音，请稍候...", "warn");
+        });
+
+        async function saveRecording() {
+            if (!audioChunks.length) {
+                showMessage("没有采集到音频数据，请重试。", "err");
+                resetUI();
+                return;
+            }
+
+            const blobType = (mediaRecorder && mediaRecorder.mimeType) || "audio/webm";
+            const audioBlob = new Blob(audioChunks, { type: blobType });
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+                try {
+                    const audioData = reader.result;
+                    const response = await fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: "audio_data=" + encodeURIComponent(audioData) +
+                            "&question_duration=" + encodeURIComponent(currentQuestionDuration.toFixed(3))
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === "completed") {
+                        recordingStatus.textContent = "已完成";
+                        showMessage("录音已保存，实验完成。", "ok");
+                        startCountdown(3, "/completion");
+                        return;
+                    }
+
+                    if (data.status === "success") {
+                        recordingStatus.textContent = "录音保存成功";
+                        showMessage("录音保存成功，可以进入下一张。", "ok");
+                        nextImageBtn.disabled = false;
+                        startButton.disabled = false;
+                        stopButton.disabled = true;
+                        return;
+                    }
+
+                    showMessage("保存失败: " + (data.message || "未知错误"), "err");
+                    resetUI();
+                } catch (error) {
+                    console.error("save recording error:", error);
+                    showMessage("录音上传失败，请检查网络或后端日志。", "err");
+                    resetUI();
+                }
+            };
+
+            reader.readAsDataURL(audioBlob);
+        }
+
+        function nextImage() {
+            if (nextImageBtn.disabled) {
+                showMessage("请先完成本题录音并保存。", "err");
+                return;
+            }
+            const currentIndex = parseInt("{{ image_index }}", 10);
+            const nextIndex = currentIndex + 1;
+            window.location.href = "/answer/{{ group }}/" + nextIndex;
+        }
+
+        window.addEventListener("beforeunload", (event) => {
+            if (isRecording) {
+                event.preventDefault();
+                event.returnValue = "正在录音，离开页面会丢失本次录音。";
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            resetUI();
+        });
+    </script>
+</body>
+</html>

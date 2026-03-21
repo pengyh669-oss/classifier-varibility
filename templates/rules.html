@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验规则与说明</title>
+    <style>
+        /* 统一的现代风格变量 */
+        :root {
+            --primary-color: #4c51bf;
+            /* 主色：柔和的靛蓝色 */
+            --primary-light: #667eea;
+            --bg-page: #f4f6f9;
+            /* 页面背景：浅灰蓝 */
+            --bg-card: #ffffff;
+            /* 卡片背景：白色 */
+            --text-dark: #333333;
+            --text-medium: #666666;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            /* 成功：绿色 */
+            --warning-color: #f59e0b;
+            /* 警告：橙色 */
+            --error-color: #ef4444;
+            /* 错误：红色 */
+            --font-clean: 'Segoe UI', system-ui, sans-serif, 'Microsoft YaHei';
+        }
+
+        body {
+            background-color: var(--bg-page);
+            min-height: 100vh;
+            font-family: var(--font-clean);
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        .full-height {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .rules-container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* 卡片基础样式 */
+        .card-section {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            /* 柔和的阴影 */
+            transition: transform 0.3s;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary-color);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-light);
+            font-weight: 600;
+        }
+
+        h4 {
+            color: var(--primary-color);
+        }
+
+        p,
+        li {
+            color: var(--text-medium);
+            font-size: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+            margin-bottom: 5px;
+            transition: color 0.2s;
+        }
+
+        li::before {
+            content: '✓';
+            /* 使用简单的勾号 */
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* 输入框样式 */
+        .form-control {
+            background: var(--bg-page);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-dark);
+            font-size: 1rem;
+            padding: 12px 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus {
+            background: var(--bg-page);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        /* 按钮基础样式 */
+        .btn-success,
+        .btn-primary,
+        .btn-restart {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            width: 100%;
+            /* block 效果 */
+            display: block;
+            text-decoration: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* 验证/重新输入按钮 (主色) */
+        .btn-success {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 81, 191, 0.3);
+        }
+
+        .btn-success:hover {
+            background-color: #3f47ac;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 81, 191, 0.4);
+        }
+
+        /* 选择实验组按钮 (次色) */
+        .btn-primary {
+            background-color: var(--primary-light);
+            color: white;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #5369c7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 重新开始按钮 (浅灰/蓝) */
+        .btn-restart {
+            background-color: #5a67d8;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(90, 103, 216, 0.3);
+            width: auto;
+            /* 恢复宽度，保持原布局 */
+            display: inline-block;
+            text-transform: none;
+        }
+
+        .btn-restart:hover {
+            background-color: #434190;
+        }
+
+        /* 消息框样式 */
+        .error-message,
+        .warning-message,
+        .success-message {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            font-size: 1rem;
+        }
+
+        .error-message {
+            background-color: #fee2e2;
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .warning-message {
+            background-color: #fffbeb;
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .success-message {
+            background-color: #d1fae5;
+            border-color: var(--success-color);
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .form-text {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            padding-left: 10px;
+            border-left: 2px solid var(--border-color);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-3 {
+            margin-top: 1rem !important;
+        }
+
+        .mt-5 {
+            margin-top: 3rem !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        .text-muted {
+            color: var(--text-medium) !important;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .card-section {
+                padding: 20px;
+            }
+
+            .form-col {
+                min-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h3 {
+                font-size: 1.4rem;
+            }
+
+            .btn-success,
+            .btn-primary,
+            .btn-restart {
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="full-height">
+        <div class="container rules-container">
+            <div class="card-section">
+                <h3 class="text-center mb-4" style="border-left: none;">请输入您的学号和姓名</h3>
+
+                {% if error %}
+                <div class="error-message">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                {% if completed_warning %}
+                <div class="warning-message">
+                    {{ completed_warning }}
+                    <div class="mt-3 text-center">
+                        <a href="{{ url_for('restart') }}" class="btn btn-restart">
+                            重新开始实验
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if show_rules and student_id and student_name and not completed_warning %}
+                <div class="success-message">
+                    <strong>✓ 信息已验证：</strong><br>
+                    学号：{{ student_id }}<br>
+                    姓名：{{ student_name }}
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('rules') }}" autocomplete="off">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="student_id_display"><strong>学号：</strong></label>
+                                <input type="text" id="student_id_display" name="student_id_display"
+                                    class="form-control form-control-lg" placeholder="请输入10位数字学号" required
+                                    pattern="\d{10}" title="请输入10位数字学号" value="{{ student_id if student_id else '' }}"
+                                    maxlength="10" minlength="10" autocomplete="one-time-code" autocapitalize="off"
+                                    autocorrect="off" spellcheck="false" inputmode="numeric" readonly
+                                    onfocus="this.removeAttribute('readonly');">
+                                <input type="hidden" id="student_id" name="student_id" value="{{ student_id if student_id else '' }}">
+                                <small class="form-text">
+                                    请输入您的10位数字学号
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="student_name"><strong>姓名：</strong></label>
+                                <input type="text" id="student_name" name="student_name"
+                                    class="form-control form-control-lg" placeholder="请输入真实姓名" required
+                                    value="{{ student_name if student_name else '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block btn-lg mt-3">
+                        {% if show_rules and student_id and student_name and not completed_warning %}
+                        重新输入信息
+                        {% else %}
+                        验证信息
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+
+            {% if show_rules and student_id and student_name and not completed_warning %}
+            <div class="card-section">
+                <h1 class="text-center mb-4">实验规则与说明</h1>
+
+                <h3>实验目的</h3>
+                <p>本实验旨在研究在不同提示句下对图片描述内容的影响。</p>
+
+                <h3>实验规则</h3>
+                <ul>
+                    <li>实验包含包含60张图片，你需要根据图片中红框的内容来完成句子。</li>
+                    <li>回答时点击开始录音，录音结束后点击结束录音。</li>
+                    <li>点击"加载下一张图片"按钮切换到下一张图片。</li>
+                    <li>必须为每张图片提供答案，未回答的图片不能跳过。</li>
+                    <li>进行录音的时候要吐字清楚，声音尽量大点，语速适中。</li>
+                </ul>
+
+                <h3>实验说明</h3>
+                <p>在实验时，你会看见一系列图片以及提示句，当看见"这是一___。"时，你可以进行自由描述但要涵盖句子的基本结构</p>
+                <p>当看见类似"这是一个___"，"这是一___狗"，你只需要根据括号中的内容完成录音，例如：“这是一个 <b><u>动物</u></b>”、“这是一只 <b><u>狗</u></b>”</p>
+                <p>当你不知道图片中具体的描述内容时，可以使用概括性强的词汇描述,不能肆意说与图片无关的内容</p>
+
+                <div class="text-center mt-5">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                        选择实验组，开始实验
+                    </a>
+                </div>
+            </div>
+            {% elif not completed_warning %}
+            <div class="card-section text-center">
+                <h4>请先输入您的学号和姓名后再查看实验规则</h4>
+                <p class="text-muted">学号和姓名将作为录音的标识符</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // 学号输入验证
+        document.getElementById('student_id_display').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+
+        // 表单提交验证
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const studentId = document.getElementById('student_id_display').value;
+            document.getElementById('student_id').value = studentId;
+            const studentName = document.getElementById('student_name').value.trim();
+            let hasError = false;
+            let errorMessage = '';
+
+            // 移除原有的错误信息
+            const form = this;
+            const existingError = form.querySelector('.error-message');
+            if (existingError) existingError.remove();
+
+            // 验证学号
+            if (studentId.length !== 10) {
+                hasError = true;
+                errorMessage = '请输入10位数字学号！';
+            }
+            // 验证姓名（仅检查是否为空）
+            else if (!studentName) {
+                hasError = true;
+                errorMessage = '请输入姓名！';
+            }
+            // 检查姓名中的不允许字符
+            else if (/[<>:"/\\|?*]/.test(studentName)) {
+                hasError = true;
+                errorMessage = '姓名包含不允许的特殊字符（<>:"/\\|?*）！';
+            }
+
+            if (hasError) {
+                e.preventDefault();
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = errorMessage;
+                form.insertBefore(errorDiv, form.firstChild);
+                return false;
+            }
+        });
+
+        // 自动聚焦到第一个输入框
+        window.onload = function () {
+            if (!document.getElementById('student_id_display').value) {
+                document.getElementById('student_id_display').focus();
+            }
+        };
+    </script>
+</body>
+
+</html>
