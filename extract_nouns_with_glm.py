@@ -6,11 +6,11 @@ import os
 import time
 from pathlib import Path
 
-from zai import ZhipuAiClient
+from zhipuai import ZhipuAI
 
 DEFAULT_INPUT_DIR = Path("translation") / "extracted"
 DEFAULT_OUTPUT_DIR = Path("translation") / "noun_text"
-DEFAULT_MODEL = "glm-5"
+DEFAULT_MODEL = "glm-4.7"
 DEFAULT_TEMPERATURE = 0.1
 DEFAULT_CHUNK_SIZE = 40
 DEFAULT_RETRIES = 3
@@ -103,7 +103,7 @@ def parse_response_text(content: str) -> list[dict[str, object]]:
 
 
 def request_nouns(
-    client: ZhipuAiClient,
+    client: ZhipuAI,
     items: list[dict[str, object]],
     *,
     model: str,
@@ -245,7 +245,7 @@ def run(
         txt_files = txt_files[:limit]
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    client = ZhipuAiClient(api_key=api_key)
+    client = ZhipuAI(api_key=api_key)
 
     processed_files = 0
     skipped_files = 0
