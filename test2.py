@@ -22,6 +22,10 @@ app.secret_key = 'your_secret_key_here'
 group_prompts = {}
 all_processed_data_cache = {}
 
+# 项目根目录与数据源目录
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_SOURCE_DIR = os.path.join(BASE_DIR, "数据源")
+
 # 指定ffmpeg路径（根据您的实际路径修改）
 FFMPEG_PATH = r"C:\ffmpeg\ffmpeg-master-latest-win64-gpl-shared\bin\ffmpeg.exe"
 
@@ -676,8 +680,12 @@ def load_and_download_all_data():
 
     all_processed_data = {}
 
-    for file_key, file_path in data_files.items():
+    for file_key, file_name in data_files.items():
+        file_path = os.path.join(DATA_SOURCE_DIR, file_name)
         try:
+            if not os.path.exists(file_path):
+                print(f"数据文件不存在: {file_path}")
+                continue
             data = pd.read_excel(file_path)
             required_columns = ['vg_object_id', 'prompt', 'link_mn']
             if not all(col in data.columns for col in required_columns):

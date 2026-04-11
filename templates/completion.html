@@ -4,140 +4,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实验完成</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        html, body {
-            height: 100%;
+        :root {
+            --bg-main: #f3faf6;
+            --bg-alt: #eef5ff;
+            --card: #ffffff;
+            --text: #1f2a33;
+            --muted: #58717e;
+            --line: #d5e9df;
+            --brand: #0f766e;
+            --accent: #0369a1;
+            --ok: #15803d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
             margin: 0;
-        }
-
-        .full-height {
             min-height: 100vh;
+            font-family: "HarmonyOS Sans SC", "Source Han Sans CN", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 6%, rgba(255, 241, 184, 0.74) 0, transparent 34%),
+                radial-gradient(circle at 90% 0%, rgba(200, 229, 247, 0.82) 0, transparent 34%),
+                linear-gradient(150deg, var(--bg-main) 0%, var(--bg-alt) 100%);
+            padding: 24px 14px;
+        }
+
+        .shell {
+            max-width: 960px;
+            margin: 0 auto;
+            animation: enter 0.5s ease;
+        }
+
+        .hero {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #deefe7;
+            border-radius: 18px;
+            box-shadow: 0 18px 34px rgba(27, 43, 56, 0.12);
+            padding: 18px 22px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            background-color: #f8f9fa;
-            padding: 20px 0;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
-        .completion-container {
-            max-width: 600px;
-            width: 100%;
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            letter-spacing: 0.08em;
         }
 
-        .success-icon {
-            color: #28a745;
-            font-size: 80px;
-            margin-bottom: 20px;
+        .hero h1 {
+            margin: 5px 0 0;
+            font-size: clamp(1.5rem, 2.2vw, 2rem);
+        }
+
+        .state {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 800;
+            color: var(--ok);
+            background: #ddfae8;
+            border: 1px solid #a7efbf;
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .state-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--ok);
+        }
+
+        .main {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 14px;
         }
 
         .card {
-            background-color: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            text-align: center;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 12px 24px rgba(27, 43, 56, 0.08);
+            padding: 18px;
         }
 
-        .info-item {
-            margin: 15px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #28a745;
-            text-align: left;
+        .thanks {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
         }
 
-        .highlight {
-            color: #28a745;
-            font-weight: bold;
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
         }
 
-        .btn-container {
-            margin-top: 30px;
+        .stat {
+            border: 1px solid #d8ebe3;
+            border-radius: 14px;
+            background: #f9fffc;
+            padding: 12px;
         }
 
-        .btn-restart {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
-            color: white;
-            padding: 12px 40px;
-            font-size: 18px;
-            margin-top: 20px;
+        .stat .label {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 0 0 6px;
         }
 
-        .btn-restart:hover {
-            background-color: #138496;
-            border-color: #117a8b;
-            color: white;
+        .stat .value {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--brand);
+            line-height: 1.35;
+            word-break: break-word;
         }
 
-        /* 动画效果 */
-        @keyframes fadeInUp {
+        .notice {
+            margin-top: 14px;
+            border-radius: 14px;
+            border: 1px solid #c7e2f0;
+            background: linear-gradient(140deg, #eff9ff 0%, #f8fdff 100%);
+            padding: 12px 14px;
+            color: #0f3f5f;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .notice strong {
+            color: #0369a1;
+        }
+
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 11px;
+            min-height: 44px;
+            padding: 9px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: saturate(1.02);
+        }
+
+        .btn-main {
+            color: #fff;
+            background: linear-gradient(135deg, #0ea5e9 0%, var(--accent) 100%);
+            box-shadow: 0 10px 16px rgba(3, 105, 161, 0.24);
+        }
+
+        .hint {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 760px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+        @keyframes enter {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(8px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        .card {
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .card {
-                padding: 25px;
-            }
-
-            .success-icon {
-                font-size: 60px;
-            }
-        }
     </style>
 </head>
-<body class="full-height">
-    <div class="completion-container">
-        <div class="card">
-            <div class="success-icon">✓</div>
-            <h1 class="mb-4">实验完成！</h1>
-            <p class="lead mb-4">感谢您参与本次实验！</p>
-
-            <div class="mb-4">
-                <div class="info-item">
-                    <strong>学号：</strong><span class="highlight">{{ student_id }}</span>
-                </div>
-                <div class="info-item">
-                    <strong>完成组别：</strong>{{ group }}
-                </div>
-                <div class="info-item">
-                    <strong>录音文件数：</strong><span class="highlight">{{ recording_count }}</span> 个
-                </div>
-                <div class="info-item">
-                    <strong>总耗时：</strong><span class="highlight">{{ total_duration }}</span> 秒
-                </div>
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div>
+                <p>Language Experiment Console</p>
+                <h1>实验已完成</h1>
             </div>
+            <span class="state"><span class="state-dot"></span>数据采集完成</span>
+        </header>
 
-            <div class="alert alert-info mt-4">
-                <h5>数据保存说明</h5>
-                <p class="mb-0">
-                    您的录音文件已保存，文件名格式为：<br>
-                    <code>{{ student_id }}_组别_图片ID_时间戳.mp3</code><br>
-                    学号已作为录音文件名的标识部分。
-                </p>
-            </div>
+        <main class="main">
+            <section class="card">
+                <p class="thanks">感谢参与本次实验，你的语音数据已经写入系统。</p>
 
-            <div class="btn-container">
-                <a href="{{ url_for('restart') }}" class="btn btn-restart">
-                    重新开始实验
-                </a>
-                <p class="text-muted mt-3">点击上方按钮将清除当前学号，返回到学号输入页面</p>
-            </div>
-        </div>
+                <div class="stats">
+                    <article class="stat">
+                        <p class="label">学号</p>
+                        <p class="value">{{ student_id }}</p>
+                    </article>
+                    <article class="stat">
+                        <p class="label">完成组别</p>
+                        <p class="value">{{ group }}</p>
+                    </article>
+                    <article class="stat">
+                        <p class="label">录音文件数</p>
+                        <p class="value">{{ recording_count }} 个</p>
+                    </article>
+                    <article class="stat">
+                        <p class="label">成功保存数</p>
+                        <p class="value">{{ success_count }} 个</p>
+                    </article>
+                    <article class="stat">
+                        <p class="label">总耗时</p>
+                        <p class="value">{{ total_duration }} 秒</p>
+                    </article>
+                    <article class="stat">
+                        <p class="label">姓名</p>
+                        <p class="value">{{ student_name }}</p>
+                    </article>
+                </div>
+
+                <div class="notice">
+                    <strong>数据说明：</strong>录音文件已按学号、组别和题目唯一键保存为 WAV 格式，后续可直接用于转写和统计分析。
+                </div>
+
+                <div class="actions">
+                    <a href="{{ url_for('restart') }}" class="btn btn-main">重新开始实验</a>
+                    <p class="hint">点击后将清理当前会话并返回身份验证页面。</p>
+                </div>
+            </section>
+        </main>
     </div>
 </body>
 </html>

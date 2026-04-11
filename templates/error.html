@@ -1,74 +1,179 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>错误页面</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>系统错误</title>
     <style>
+        :root {
+            --bg-main: #f5faf8;
+            --bg-alt: #eef5ff;
+            --card: #ffffff;
+            --text: #1f2a33;
+            --muted: #596d7a;
+            --line: #d6e8df;
+            --err: #b91c1c;
+            --accent: #0369a1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
             min-height: 100vh;
+            font-family: "HarmonyOS Sans SC", "Source Han Sans CN", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 8% 4%, rgba(255, 233, 233, 0.84) 0, transparent 32%),
+                radial-gradient(circle at 94% 0%, rgba(205, 228, 248, 0.86) 0, transparent 34%),
+                linear-gradient(150deg, var(--bg-main) 0%, var(--bg-alt) 100%);
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            justify-content: center;
+            padding: 16px;
         }
 
-        .error-container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            text-align: center;
+        .error-wrap {
+            width: min(680px, 100%);
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 20px 36px rgba(24, 41, 54, 0.12);
+            padding: 24px;
+            animation: enter 0.45s ease;
         }
 
-        .error-icon {
-            font-size: 80px;
-            color: #dc3545;
-            margin-bottom: 20px;
+        .top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
+        .icon {
+            width: 42px;
+            height: 42px;
             border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            color: #721c24;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fee2e2;
+            color: var(--err);
+            font-size: 26px;
+            font-weight: 700;
+            flex: 0 0 auto;
         }
 
-        .btn-home {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            margin-top: 20px;
+        .head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            letter-spacing: 0.08em;
         }
 
-        .btn-home:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        .head h1 {
+            margin: 6px 0 0;
+            font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+        }
+
+        .msg-box {
+            margin-top: 16px;
+            border-radius: 14px;
+            border: 1px solid #fecaca;
+            background: #fff5f5;
+            color: #991b1b;
+            padding: 12px 14px;
+            line-height: 1.6;
+        }
+
+        .tips {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 11px;
+            min-height: 43px;
+            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: saturate(1.02);
+        }
+
+        .btn-main {
+            color: #fff;
+            background: linear-gradient(135deg, #0ea5e9 0%, var(--accent) 100%);
+            box-shadow: 0 10px 16px rgba(3, 105, 161, 0.24);
+        }
+
+        .btn-light {
+            color: #0f766e;
+            background: #effaf7;
+            border: 1px solid #c6e8dc;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+        @keyframes enter {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="error-container">
-        <div class="error-icon">⚠️</div>
-        <h1>系统错误</h1>
-        <div class="error-message">
+    <main class="error-wrap">
+        <section class="top">
+            <div class="icon">!</div>
+            <div class="head">
+                <p>Language Experiment Console</p>
+                <h1>系统发生异常</h1>
+            </div>
+        </section>
+
+        <div class="msg-box">
             {{ error }}
         </div>
-        <p>抱歉，系统遇到了一个错误。您可以返回主页重试。</p>
-        <a href="{{ url_for('rules') }}" class="btn btn-home">返回首页</a>
-    </div>
+
+        <p class="tips">
+            建议返回首页后重新开始。若多次出现相同问题，可联系实验管理员并提供当前时间与学号信息。
+        </p>
+
+        <div class="actions">
+            <a href="{{ url_for('rules') }}" class="btn btn-main">返回首页</a>
+            <button type="button" class="btn btn-light" onclick="window.location.reload();">刷新页面</button>
+        </div>
+    </main>
 </body>
 </html>

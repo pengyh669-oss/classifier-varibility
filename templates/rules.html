@@ -1,365 +1,422 @@
 <!DOCTYPE html>
-<html lang="zh">
-
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实验规则与说明</title>
     <style>
-        /* 统一的现代风格变量 */
         :root {
-            --primary-color: #4c51bf;
-            /* 主色：柔和的靛蓝色 */
-            --primary-light: #667eea;
-            --bg-page: #f4f6f9;
-            /* 页面背景：浅灰蓝 */
-            --bg-card: #ffffff;
-            /* 卡片背景：白色 */
-            --text-dark: #333333;
-            --text-medium: #666666;
-            --border-color: #e2e8f0;
-            --success-color: #059669;
-            /* 成功：绿色 */
-            --warning-color: #f59e0b;
-            /* 警告：橙色 */
-            --error-color: #ef4444;
-            /* 错误：红色 */
-            --font-clean: 'Segoe UI', system-ui, sans-serif, 'Microsoft YaHei';
+            --bg-main: #f2f8f4;
+            --bg-alt: #eef3ff;
+            --card: rgba(255, 255, 255, 0.86);
+            --card-strong: #ffffff;
+            --text: #1d2a33;
+            --muted: #4f6270;
+            --line: #d7e6df;
+            --brand: #0f766e;
+            --brand-soft: #d6f0eb;
+            --accent: #0369a1;
+            --ok: #15803d;
+            --warn: #b45309;
+            --err: #b91c1c;
+            --shadow: 0 18px 36px rgba(25, 40, 52, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--bg-page);
+            margin: 0;
             min-height: 100vh;
-            font-family: var(--font-clean);
-            color: var(--text-dark);
-            line-height: 1.7;
+            font-family: "HarmonyOS Sans SC", "Source Han Sans CN", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 8% 6%, rgba(255, 241, 184, 0.85) 0, transparent 36%),
+                radial-gradient(circle at 90% 0%, rgba(193, 229, 246, 0.65) 0, transparent 34%),
+                linear-gradient(155deg, var(--bg-main) 0%, var(--bg-alt) 100%);
+            padding: 26px 14px;
         }
 
-        .full-height {
-            min-height: 100vh;
+        .shell {
+            max-width: 1160px;
+            margin: 0 auto;
+            animation: enter 0.5s ease;
+        }
+
+        .hero {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.88);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 18px 22px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-top {
             display: flex;
-            justify-content: center;
+            flex-wrap: wrap;
             align-items: center;
-            padding: 40px 20px;
+            justify-content: space-between;
+            gap: 10px;
         }
 
-        .rules-container {
-            max-width: 800px;
-            width: 100%;
+        .eyebrow {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            letter-spacing: 0.08em;
         }
 
-        /* 卡片基础样式 */
-        .card-section {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            /* 柔和的阴影 */
-            transition: transform 0.3s;
+        .hero h1 {
+            margin: 5px 0 0;
+            font-size: clamp(1.5rem, 2.2vw, 2rem);
+            letter-spacing: 0.03em;
         }
 
-        /* 标题样式 */
-        h1 {
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 10px;
-            border-bottom: 3px solid var(--primary-color);
-            text-align: center;
+        .badge {
+            background: #e9f7f4;
+            border: 1px solid #cbe9e2;
+            color: var(--brand);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
             font-weight: 700;
+            white-space: nowrap;
         }
 
-        h3 {
-            color: var(--primary-color);
-            font-size: 1.4rem;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            padding-left: 15px;
-            border-left: 4px solid var(--primary-light);
-            font-weight: 600;
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: 16px;
         }
 
-        h4 {
-            color: var(--primary-color);
+        .card {
+            background: var(--card-strong);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 14px 28px rgba(25, 40, 52, 0.08);
         }
 
-        p,
-        li {
-            color: var(--text-medium);
-            font-size: 1rem;
+        .identity-card {
+            padding: 20px;
         }
 
-        ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        li {
-            padding: 8px 0 8px 30px;
-            position: relative;
-            margin-bottom: 5px;
-            transition: color 0.2s;
-        }
-
-        li::before {
-            content: '✓';
-            /* 使用简单的勾号 */
-            position: absolute;
-            left: 0;
-            color: var(--success-color);
+        .identity-card h2 {
+            margin: 0 0 8px;
             font-size: 1.2rem;
-            font-weight: bold;
         }
 
-        /* 输入框样式 */
-        .form-control {
-            background: var(--bg-page);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-dark);
-            font-size: 1rem;
-            padding: 12px 15px;
-            transition: border-color 0.3s, box-shadow 0.3s;
+        .identity-card .subtitle {
+            margin: 0 0 14px;
+            color: var(--muted);
+            font-size: 14px;
         }
 
-        .form-control:focus {
-            background: var(--bg-page);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
-            outline: none;
+        .msg {
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
-        .form-control::placeholder {
-            color: #64748b;
+        .msg.error {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: var(--err);
+        }
+
+        .msg.warn {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: var(--warn);
+        }
+
+        .msg.success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .restart-wrap {
+            margin-top: 10px;
         }
 
         .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
 
-        .form-col {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .form-group label {
+        label {
             display: block;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-            font-weight: 600;
+            margin-bottom: 7px;
+            font-weight: 700;
+            font-size: 14px;
         }
 
-        /* 按钮基础样式 */
-        .btn-success,
-        .btn-primary,
-        .btn-restart {
-            border: none;
-            border-radius: 8px;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: all 0.3s;
-            text-transform: uppercase;
+        .input {
             width: 100%;
-            /* block 效果 */
-            display: block;
-            text-decoration: none;
+            border: 1px solid #cde1d8;
+            background: #fbfffd;
+            color: var(--text);
+            border-radius: 11px;
+            padding: 11px 12px;
+            font-size: 15px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+        }
+
+        .help {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 45px;
+            padding: 10px 14px;
             cursor: pointer;
-            text-align: center;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
         }
 
-        /* 验证/重新输入按钮 (主色) */
-        .btn-success {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 10px rgba(76, 81, 191, 0.3);
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: saturate(1.02);
         }
 
-        .btn-success:hover {
-            background-color: #3f47ac;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(76, 81, 191, 0.4);
-        }
-
-        /* 选择实验组按钮 (次色) */
-        .btn-primary {
-            background-color: var(--primary-light);
-            color: white;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            background-color: #5369c7;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        /* 重新开始按钮 (浅灰/蓝) */
-        .btn-restart {
-            background-color: #5a67d8;
+        .btn-main {
+            width: 100%;
+            margin-top: 12px;
             color: #fff;
-            box-shadow: 0 4px 8px rgba(90, 103, 216, 0.3);
-            width: auto;
-            /* 恢复宽度，保持原布局 */
-            display: inline-block;
-            text-transform: none;
+            background: linear-gradient(135deg, #14b8a6 0%, var(--brand) 100%);
+            box-shadow: 0 10px 16px rgba(15, 118, 110, 0.24);
         }
 
-        .btn-restart:hover {
-            background-color: #434190;
+        .btn-secondary {
+            color: #fff;
+            background: linear-gradient(135deg, #0ea5e9 0%, var(--accent) 100%);
+            box-shadow: 0 10px 16px rgba(3, 105, 161, 0.24);
+            padding-inline: 18px;
         }
 
-        /* 消息框样式 */
-        .error-message,
-        .warning-message,
-        .success-message {
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
+        .btn-outline {
+            color: var(--brand);
+            background: #effaf7;
+            border: 1px solid #b6e5da;
+        }
+
+        .rules-card {
+            padding: 22px 22px 24px;
+        }
+
+        .rules-card h3 {
+            margin: 0 0 12px;
+            font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rules-card h3::before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #34d399 0%, #0891b2 100%);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+        }
+
+        .section {
+            margin-top: 14px;
+            background: #fbfffd;
+            border: 1px solid #d9ebe3;
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .section h4 {
+            margin: 0 0 9px;
             font-size: 1rem;
+            color: var(--brand);
         }
 
-        .error-message {
-            background-color: #fee2e2;
-            border-color: var(--error-color);
-            color: var(--error-color);
+        .section p {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.65;
         }
 
-        .warning-message {
-            background-color: #fffbeb;
-            border-color: var(--warning-color);
-            color: var(--warning-color);
+        .rules-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .success-message {
-            background-color: #d1fae5;
-            border-color: var(--success-color);
-            color: var(--success-color);
-            font-weight: 600;
+        .rules-list li {
+            position: relative;
+            margin: 0 0 8px;
+            padding-left: 22px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
         }
 
-        .form-text {
-            color: var(--text-medium);
-            font-size: 0.9rem;
-            margin-top: 5px;
-            padding-left: 10px;
-            border-left: 2px solid var(--border-color);
+        .rules-list li::before {
+            content: "●";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent);
+            font-size: 12px;
         }
 
-        .text-center {
+        .rules-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hint-card {
+            padding: 24px;
             text-align: center;
         }
 
-        .mt-3 {
-            margin-top: 1rem !important;
+        .hint-card h4 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
         }
 
-        .mt-5 {
-            margin-top: 3rem !important;
+        .hint-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
         }
 
-        .mb-4 {
-            margin-bottom: 1.5rem !important;
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .text-muted {
-            color: var(--text-medium) !important;
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
         }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .card-section {
-                padding: 20px;
+        @keyframes enter {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
             }
-
-            .form-col {
-                min-width: 100%;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h3 {
-                font-size: 1.4rem;
-            }
-
-            .btn-success,
-            .btn-primary,
-            .btn-restart {
-                padding: 12px 15px;
-                font-size: 1rem;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
     </style>
 </head>
-
 <body>
-    <div class="full-height">
-        <div class="container rules-container">
-            <div class="card-section">
-                <h3 class="text-center mb-4" style="border-left: none;">请输入您的学号和姓名</h3>
+    <div class="shell">
+        <header class="hero">
+            <div class="hero-top">
+                <div>
+                    <p class="eyebrow">Language Experiment Console</p>
+                    <h1>实验规则与身份验证</h1>
+                </div>
+                <span class="badge">流程 1 / 3</span>
+            </div>
+        </header>
+
+        <main class="layout">
+            <section class="card identity-card">
+                <h2>填写被试信息</h2>
+                <p class="subtitle">请使用有效学号与真实姓名，系统会据此保存录音与统计数据。</p>
 
                 {% if error %}
-                <div class="error-message">
-                    {{ error }}
-                </div>
+                <div class="msg error">{{ error }}</div>
                 {% endif %}
 
                 {% if completed_warning %}
-                <div class="warning-message">
+                <div class="msg warn">
                     {{ completed_warning }}
-                    <div class="mt-3 text-center">
-                        <a href="{{ url_for('restart') }}" class="btn btn-restart">
-                            重新开始实验
-                        </a>
+                    <div class="restart-wrap">
+                        <a href="{{ url_for('restart') }}" class="btn btn-outline">重新开始实验</a>
                     </div>
                 </div>
                 {% endif %}
 
                 {% if show_rules and student_id and student_name and not completed_warning %}
-                <div class="success-message">
-                    <strong>✓ 信息已验证：</strong><br>
-                    学号：{{ student_id }}<br>
-                    姓名：{{ student_name }}
+                <div class="msg success">
+                    信息已验证：学号 {{ student_id }}，姓名 {{ student_name }}
                 </div>
                 {% endif %}
 
                 <form method="POST" action="{{ url_for('rules') }}" autocomplete="off">
                     <div class="form-row">
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="student_id_display"><strong>学号：</strong></label>
-                                <input type="text" id="student_id_display" name="student_id_display"
-                                    class="form-control form-control-lg" placeholder="请输入10位数字学号" required
-                                    pattern="\d{10}" title="请输入10位数字学号" value="{{ student_id if student_id else '' }}"
-                                    maxlength="10" minlength="10" autocomplete="one-time-code" autocapitalize="off"
-                                    autocorrect="off" spellcheck="false" inputmode="numeric" readonly
-                                    onfocus="this.removeAttribute('readonly');">
-                                <input type="hidden" id="student_id" name="student_id" value="{{ student_id if student_id else '' }}">
-                                <small class="form-text">
-                                    请输入您的10位数字学号
-                                </small>
-                            </div>
+                        <div>
+                            <label for="student_id_display">学号</label>
+                            <input
+                                type="text"
+                                id="student_id_display"
+                                name="student_id_display"
+                                class="input"
+                                placeholder="请输入 10 位数字学号"
+                                required
+                                pattern="\d{10}"
+                                title="请输入10位数字学号"
+                                value="{{ student_id if student_id else '' }}"
+                                maxlength="10"
+                                minlength="10"
+                                autocomplete="one-time-code"
+                                autocapitalize="off"
+                                autocorrect="off"
+                                spellcheck="false"
+                                inputmode="numeric"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                            >
+                            <input type="hidden" id="student_id" name="student_id" value="{{ student_id if student_id else '' }}">
+                            <p class="help">仅允许 10 位数字。</p>
                         </div>
 
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="student_name"><strong>姓名：</strong></label>
-                                <input type="text" id="student_name" name="student_name"
-                                    class="form-control form-control-lg" placeholder="请输入真实姓名" required
-                                    value="{{ student_name if student_name else '' }}">
-                            </div>
+                        <div>
+                            <label for="student_name">姓名</label>
+                            <input
+                                type="text"
+                                id="student_name"
+                                name="student_name"
+                                class="input"
+                                placeholder="请输入真实姓名"
+                                required
+                                value="{{ student_name if student_name else '' }}"
+                            >
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success btn-block btn-lg mt-3">
+                    <button type="submit" class="btn btn-main">
                         {% if show_rules and student_id and student_name and not completed_warning %}
                         重新输入信息
                         {% else %}
@@ -367,99 +424,93 @@
                         {% endif %}
                     </button>
                 </form>
-            </div>
+            </section>
 
             {% if show_rules and student_id and student_name and not completed_warning %}
-            <div class="card-section">
-                <h1 class="text-center mb-4">实验规则与说明</h1>
-
-                <h3>实验目的</h3>
-                <p>本实验旨在研究在不同提示句下对图片描述内容的影响。</p>
-
-                <h3>实验规则</h3>
-                <ul>
-                    <li>实验包含包含60张图片，你需要根据图片中红框的内容来完成句子。</li>
-                    <li>回答时点击开始录音，录音结束后点击结束录音。</li>
-                    <li>点击"加载下一张图片"按钮切换到下一张图片。</li>
-                    <li>必须为每张图片提供答案，未回答的图片不能跳过。</li>
-                    <li>进行录音的时候要吐字清楚，声音尽量大点，语速适中。</li>
-                </ul>
-
+            <section class="card rules-card">
                 <h3>实验说明</h3>
-                <p>在实验时，你会看见一系列图片以及提示句，当看见"这是一___。"时，你可以进行自由描述但要涵盖句子的基本结构</p>
-                <p>当看见类似"这是一个___"，"这是一___狗"，你只需要根据括号中的内容完成录音，例如：“这是一个 <b><u>动物</u></b>”、“这是一只 <b><u>狗</u></b>”</p>
-                <p>当你不知道图片中具体的描述内容时，可以使用概括性强的词汇描述,不能肆意说与图片无关的内容</p>
 
-                <div class="text-center mt-5">
-                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
-                        选择实验组，开始实验
-                    </a>
+                <div class="section">
+                    <h4>实验目的</h4>
+                    <p>本实验用于研究不同提示句对图片口语描述内容的影响。</p>
                 </div>
-            </div>
+
+                <div class="section">
+                    <h4>实验规则</h4>
+                    <ul class="rules-list">
+                        <li>实验包含多张图片，需要根据提示句完成口头回答。</li>
+                        <li>每题需先点击“开始录音”，结束后点击“停止录音”。</li>
+                        <li>仅在当前题目保存成功后，才能进入下一张图片。</li>
+                        <li>请保证吐字清晰、音量适中、语速自然。</li>
+                        <li>回答内容需与图片相关，避免无关描述。</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h4>作答提示</h4>
+                    <p>遇到“这是一___”等提示时，按提示补全并描述图片。若不确定具体名称，可使用合理的上位词。</p>
+                </div>
+
+                <div class="rules-actions">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">选择实验组并开始</a>
+                </div>
+            </section>
             {% elif not completed_warning %}
-            <div class="card-section text-center">
-                <h4>请先输入您的学号和姓名后再查看实验规则</h4>
-                <p class="text-muted">学号和姓名将作为录音的标识符</p>
-            </div>
+            <section class="card hint-card">
+                <h4>请先完成身份验证</h4>
+                <p>通过学号与姓名校验后，将解锁完整实验规则和实验组入口。</p>
+            </section>
             {% endif %}
-        </div>
+        </main>
     </div>
 
     <script>
-        // 学号输入验证
-        document.getElementById('student_id_display').addEventListener('input', function (e) {
-            this.value = this.value.replace(/[^0-9]/g, '');
+        document.getElementById("student_id_display").addEventListener("input", function () {
+            this.value = this.value.replace(/[^0-9]/g, "");
             if (this.value.length > 10) {
                 this.value = this.value.slice(0, 10);
             }
         });
 
-        // 表单提交验证
-        document.querySelector('form').addEventListener('submit', function (e) {
-            const studentId = document.getElementById('student_id_display').value;
-            document.getElementById('student_id').value = studentId;
-            const studentName = document.getElementById('student_name').value.trim();
-            let hasError = false;
-            let errorMessage = '';
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const studentId = document.getElementById("student_id_display").value;
+            document.getElementById("student_id").value = studentId;
+            const studentName = document.getElementById("student_name").value.trim();
 
-            // 移除原有的错误信息
+            let hasError = false;
+            let errorMessage = "";
+
             const form = this;
-            const existingError = form.querySelector('.error-message');
+            const existingError = form.querySelector(".msg.error");
             if (existingError) existingError.remove();
 
-            // 验证学号
             if (studentId.length !== 10) {
                 hasError = true;
-                errorMessage = '请输入10位数字学号！';
-            }
-            // 验证姓名（仅检查是否为空）
-            else if (!studentName) {
+                errorMessage = "请输入10位数字学号。";
+            } else if (!studentName) {
                 hasError = true;
-                errorMessage = '请输入姓名！';
-            }
-            // 检查姓名中的不允许字符
-            else if (/[<>:"/\\|?*]/.test(studentName)) {
+                errorMessage = "请输入姓名。";
+            } else if (/[<>:"/\\|?*]/.test(studentName)) {
                 hasError = true;
-                errorMessage = '姓名包含不允许的特殊字符（<>:"/\\|?*）！';
+                errorMessage = "姓名包含不允许的特殊字符（<>:\"/\\|?*）。";
             }
 
             if (hasError) {
                 e.preventDefault();
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
+                const errorDiv = document.createElement("div");
+                errorDiv.className = "msg error";
                 errorDiv.textContent = errorMessage;
                 form.insertBefore(errorDiv, form.firstChild);
                 return false;
             }
         });
 
-        // 自动聚焦到第一个输入框
         window.onload = function () {
-            if (!document.getElementById('student_id_display').value) {
-                document.getElementById('student_id_display').focus();
+            const studentIdInput = document.getElementById("student_id_display");
+            if (!studentIdInput.value) {
+                studentIdInput.focus();
             }
         };
     </script>
 </body>
-
 </html>
