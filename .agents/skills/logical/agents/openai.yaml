@@ -1,0 +1,4 @@
+interface:
+  display_name: "Logical"
+  short_description: "Detailed structured logic summaries for source code files"
+  default_prompt: "Use $logical to analyze one or more code files and output a detailed, highly readable logic summary."
