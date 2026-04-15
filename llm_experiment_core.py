@@ -16,13 +16,13 @@ import pandas as pd
 from openai import OpenAI
 
 
-DATA_FILES = {
-    "result_data": "result_data.xlsx",
-    "result_data_special": "result_data_special.xlsx",
-    "result_data_free": "result_data_free.xlsx",
-    "result_data_downWord": "result_data_downWord.xlsx",
-    "result_data_upWord": "result_data_upWord.xlsx",
-    "result_data_normalWord": "result_data_normalWord.xlsx",
+DATA_SOURCES = {
+    "result_data": ("result_data.xlsx", "normal"),
+    "result_data_special": ("result_data_special.xlsx", "special"),
+    "result_data_free": ("result_data_free.xlsx", "free"),
+    "result_data_downWord": ("result_data_downWord.xlsx", "downword"),
+    "result_data_upWord": ("result_data_upWord.xlsx", "upword"),
+    "result_data_normalWord": ("result_data_normalWord.xlsx", "middle"),
 }
 
 DEFAULT_BASE_URL = "https://api.zhizengzeng.com/v1"
@@ -31,14 +31,6 @@ DEFAULT_SEED = 20260406
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 90.0
 DEFAULT_REQUEST_RETRIES = 2
 IMAGE_BASE_DIR = Path("image")
-IMAGE_SUB_DIRS = {
-    "result_data": "normal",
-    "result_data_special": "special",
-    "result_data_free": "free",
-    "result_data_downWord": "downword",
-    "result_data_upWord": "upword",
-    "result_data_normalWord": "middle",
-}
 MIN_LOCAL_IMAGE_SIZE_BYTES = 1024
 _IMAGE_DATA_URL_CACHE: dict[str, str] = {}
 COMMON_CLASSIFIERS = (
@@ -96,6 +88,7 @@ _NOISE_PREFIX_PATTERN = re.compile(
     r"^(?:答案(?:是|为)?|回答(?:是|为)?|填空(?:是|为)?|可填(?:是|为)?|应填(?:是|为)?|应该填(?:是|为)?|"
     r"图中(?:是|为)?|图片中(?:是|为)?|红框中(?:是|为)?|目标是|应为|是)\s*[:：]?\s*"
 )
+_SENTENCE_TRIM_CHARS = " 。，！？!?\"\'“”‘’（）()[]【】"
 
 
 @dataclass
@@ -206,7 +199,8 @@ def build_local_image_path(
     local_filename = f"{safe_source}_{vg_object_id}_{file_stem}{file_ext}"
     local_filename = re.sub(r'[<>:"/\\|?*]', "_", local_filename)
 
-    sub_dir = IMAGE_SUB_DIRS.get(source_file, "other")
+    source_spec = DATA_SOURCES.get(source_file)
+    sub_dir = source_spec[1] if source_spec else "other"
     return IMAGE_BASE_DIR / sub_dir / local_filename
 
 
@@ -234,7 +228,7 @@ def encode_local_image_as_data_url(image_path: Path) -> str:
 def load_question_pool() -> list[Question]:
     questions: list[Question] = []
 
-    for source_key, file_name in DATA_FILES.items():
+    for source_key, (file_name, _) in DATA_SOURCES.items():
         file_path = resolve_data_file(file_name)
         df = pd.read_excel(file_path)
 
@@ -363,7 +357,7 @@ def call_llm_once(
         f"待补全句子：{question.prompt}",
         "",
         "请按以下规则补全：",
-        "1. “这是一___。” → 补“量词+名词”。",
+        "1. “这是一___。” → 补全的内容中要包括“量词+名词”。",
         "2. “这是一____动物/植物/载具/家具/衣服/建筑/食物。” → 只补量词。",
         "3. “这是一个/只/头____。” → 只补名词。",
         "4. 若原句已有量词，不再补量词；若已有名词或类别词，不再补名词或类别词。",
@@ -462,7 +456,20 @@ def first_sentence_unit(text: str) -> str:
     if match:
         normalized = normalized[: match.start()]
 
-    return normalized.strip(" 。，！？!?\"'“”‘’（）()[]【】")
+    return _strip_sentence_noise(normalized)
+
+
+def _strip_sentence_noise(text: str) -> str:
+    return text.strip(_SENTENCE_TRIM_CHARS)
+
+
+def _trim_fill_boundaries(value: str, prefix: str, suffix_no_period: str) -> str:
+    trimmed = _strip_sentence_noise(value)
+    if prefix and trimmed.startswith(prefix):
+        trimmed = trimmed[len(prefix) :].strip()
+    if suffix_no_period and trimmed.endswith(suffix_no_period):
+        trimmed = trimmed[: -len(suffix_no_period)].strip()
+    return _strip_sentence_noise(trimmed)
 
 
 def detect_tail_classifier(prefix: str) -> str:
@@ -479,7 +486,7 @@ def detect_tail_classifier(prefix: str) -> str:
 
 
 def normalize_fill_text(text: str) -> str:
-    value = first_sentence_unit(text).strip(" 。，！？!?\"'“”‘’（）()[]【】")
+    value = _strip_sentence_noise(first_sentence_unit(text))
     while value:
         cleaned = _NOISE_PREFIX_PATTERN.sub("", value).strip()
         if cleaned == value:
@@ -526,12 +533,7 @@ def extract_fill_from_candidate(candidate: str, prefix: str, suffix: str) -> str
         if middle_match:
             value = middle_match.group(1)
 
-    value = value.strip(" 。，！？!?\"'“”‘’（）()[]【】")
-    if prefix and value.startswith(prefix):
-        value = value[len(prefix) :]
-    if suffix_no_period and value.endswith(suffix_no_period):
-        value = value[: -len(suffix_no_period)]
-
+    value = _trim_fill_boundaries(value, prefix, suffix_no_period)
     return normalize_fill_text(value)
 
 
@@ -553,11 +555,8 @@ def build_sentence(prompt: str, llm_text: str) -> str:
         normalize_fill_text(llm_text),
     ]
     fill = next((item for item in fill_candidates if item), "")
-    if prefix and fill.startswith(prefix):
-        fill = fill[len(prefix) :].strip()
     suffix_no_period = suffix.rstrip("。").strip()
-    if suffix_no_period and fill.endswith(suffix_no_period):
-        fill = fill[: -len(suffix_no_period)].strip()
+    fill = _trim_fill_boundaries(fill, prefix, suffix_no_period)
 
     if not fill:
         return normalize_sentence_by_prompt(direct_sentence, prompt)
@@ -720,6 +719,17 @@ def _split_transcript_payload(payload: str) -> tuple[str, str]:
     return payload.strip(), ""
 
 
+def _classify_outcome(sentence: str, reason: str | None) -> str:
+    reason_text = (reason or "").strip()
+    if reason_text:
+        if "empty_response" in reason_text:
+            return "empty"
+        return "failed"
+    if sentence:
+        return "success"
+    return "failed"
+
+
 def _strip_existing_summary(lines: list[str]) -> list[str]:
     for idx, line in enumerate(lines):
         if line.startswith("统计:"):
@@ -731,7 +741,9 @@ def _strip_existing_summary(lines: list[str]) -> list[str]:
 
 
 def _parse_existing_progress(
-    lines: list[str], total_count: int
+    lines: list[str],
+    total_count: int,
+    prompts_by_index: dict[int, str] | None = None,
 ) -> tuple[int, int, int, int, set[int]]:
     success_count = 0
     empty_count = 0
@@ -761,17 +773,16 @@ def _parse_existing_progress(
                 remark = lines[i][len("备注:") :].strip()
             i += 1
 
-        if remark:
-            if "empty_response" in remark:
-                empty_count += 1
-            else:
-                failed_count += 1
-        elif sentence:
+        outcome = _classify_outcome(sentence, remark)
+        if outcome == "success":
             success_count += 1
+        elif outcome == "empty":
+            empty_count += 1
         else:
             failed_count += 1
 
-        if check_rules(sentence):
+        prompt = prompts_by_index.get(index, "") if prompts_by_index else ""
+        if check_rules(sentence, prompt):
             anomaly_set.add(index)
 
     completed_count = 0
@@ -804,6 +815,7 @@ def run_experiment(
         return 2
 
     selected = select_questions(total_count, seed, pool)
+    prompt_by_index = {idx: question.prompt for idx, question in enumerate(selected, start=1)}
     client = build_client(base_url, request_timeout)
     print(f"预检: 正在测试模型连接 (model={model}, base_url={base_url}) ...")
     preflight_ok, preflight_error = preflight_model_connection(
@@ -830,7 +842,11 @@ def run_experiment(
             empty_count,
             failed_count,
             anomaly_set,
-        ) = _parse_existing_progress(existing_lines, total_count)
+        ) = _parse_existing_progress(
+            existing_lines,
+            total_count,
+            prompts_by_index=prompt_by_index,
+        )
         if existing_lines:
             lines = existing_lines
         else:
@@ -865,25 +881,26 @@ def run_experiment(
         )
         elapsed = time.perf_counter() - started
 
-        if llm_text:
+        sentence = build_sentence(question.prompt, llm_text)
+        reason = "" if sentence else (error or "模型返回内容无法解析为填空结果")
+        outcome = _classify_outcome(sentence, reason)
+        if outcome == "success":
             success_count += 1
             print(f"  -> OK ({elapsed:.2f}s)", flush=True)
-        elif error == "empty_response":
+        elif outcome == "empty":
             empty_count += 1
             print(f"  -> EMPTY ({elapsed:.2f}s)", flush=True)
         else:
             failed_count += 1
-            print(f"  -> FAIL ({elapsed:.2f}s): {error}", flush=True)
+            print(f"  -> FAIL ({elapsed:.2f}s): {reason}", flush=True)
 
-        sentence = build_sentence(question.prompt, llm_text)
         problems = check_rules(sentence, question.prompt)
         if problems:
             anomaly_set.add(index)
 
         lines.append(f"[{index}/{total_count}] 文件: {question.pseudo_filename(run_label, index)}")
         lines.append(_compose_transcript_line(sentence, llm_text))
-        if not sentence:
-            reason = error or "模型返回内容无法解析为填空结果"
+        if reason:
             lines.append(f"备注: 模型未给出可用填空结果，原因：{reason}")
         lines.append("-" * 60)
 
