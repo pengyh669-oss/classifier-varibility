@@ -6,7 +6,7 @@ from llm_experiment_core import build_common_arg_parser, run_experiment
 
 
 FORMAL_COUNT = 360
-FORMAL_OUTPUT_FILE = "LLM_glm-4.6v.txt"
+FORMAL_OUTPUT_FILE = "LLM_gpt-5.4.txt"
 
 
 def main() -> None:

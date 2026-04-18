@@ -26,7 +26,7 @@ DATA_SOURCES = {
 }
 
 DEFAULT_BASE_URL = "https://api.zhizengzeng.com/v1"
-DEFAULT_MODEL = "glm-4.6v"
+DEFAULT_MODEL = "gpt-5.4"
 DEFAULT_SEED = 20260406
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 90.0
 DEFAULT_REQUEST_RETRIES = 2
@@ -102,7 +102,7 @@ class Question:
     bbox_xywh: str = ""
 
     def pseudo_filename(self, run_label: str, index: int) -> str:
-        return f"LLM_{run_label}_{self.source_file}_{self.vg_object_id}_{index:03d}.wav"
+        return f"LLM_{run_label}_{self.source_file}_{self.vg_object_id}_{index:03d}"
 
 
 def build_common_arg_parser(description: str) -> argparse.ArgumentParser:
@@ -360,7 +360,7 @@ def call_llm_once(
         "1. “这是一___。” → 补全的内容中要包括“量词+名词”。",
         "2. “这是一____动物/植物/载具/家具/衣服/建筑/食物。” → 只补量词。",
         "3. “这是一个/只/头____。” → 只补名词。",
-        "4. 若原句已有量词，不再补量词；若已有名词或类别词，不再补名词或类别词。",
+        "4. 若原句已有量词，不再补量词；若已有名词或数词，不再补名词或数词。",
         "5. 最终只输出补全后的完整句子。",
     ]
     if question.bbox_xywh:
@@ -430,7 +430,6 @@ def preflight_model_connection(
                 {"role": "user", "content": "Reply with OK only."},
             ],
             temperature=0,
-            max_tokens=64,
             timeout=request_timeout,
         )
         # For some providers/models, content can be empty while reasoning_content exists.
