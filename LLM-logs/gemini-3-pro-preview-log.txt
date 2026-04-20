@@ -786,5 +786,3 @@
 [360/360] result_data_free | 2403045
   -> OK (10.99s)
 输出文件: E:\PythonProject\classifer-latest\translation\LLM_answer\LLM_gemini-3.1-pro-preview.txt
-规则校验: 合规 354/360 (98.33%)
-异常条目编号: 48, 127, 184, 196, 228, 328

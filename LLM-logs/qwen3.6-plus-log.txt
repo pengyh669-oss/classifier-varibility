@@ -721,5 +721,3 @@
 [360/360] result_data_free | 2403045
   -> OK (1.65s)
 输出文件: E:\PythonProject\classifer-latest\translation\LLM_answer\LLM_qwen3.6-plus.txt
-规则校验: 合规 355/360 (98.61%)
-异常条目编号: 51, 184, 196, 228, 318

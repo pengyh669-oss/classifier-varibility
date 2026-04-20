@@ -1,6 +1,5 @@
 预检: 正在测试模型连接 (model=glm-4.6v, base_url=https://api.zhizengzeng.com/v1) ...
-预检通过: 模型连接正常，开始正式实验。
-检测到已有进度: 0/360，将从下一题继续。
+
 [1/360] result_data_special | 2177658
   -> OK (21.56s)
 [2/360] result_data | 2746869
@@ -722,5 +721,3 @@
 [360/360] result_data_free | 2403045
   -> OK (15.07s)
 输出文件: E:\PythonProject\classifer-latest\translation\LLM_answer\LLM_glm-4.6v.txt
-规则校验: 合规 356/360 (98.89%)
-异常条目编号: 184, 198, 228, 270

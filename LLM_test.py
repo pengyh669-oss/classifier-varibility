@@ -6,7 +6,7 @@ from llm_experiment_core import build_common_arg_parser, run_experiment
 
 
 FORMAL_COUNT = 360
-FORMAL_OUTPUT_FILE = "LLM_qwen3.6-plus.txt"
+FORMAL_OUTPUT_FILE = "LLM_claude-sonnet-4-6.txt"
 
 
 def main() -> None:

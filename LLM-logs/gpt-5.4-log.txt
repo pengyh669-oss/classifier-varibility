@@ -720,5 +720,3 @@
 [360/360] result_data_free | 2403045
   -> OK (1.57s)
 输出文件: E:\PythonProject\classifer-latest\translation\LLM_answer\LLM_gpt-5.4.txt
-规则校验: 合规 356/360 (98.89%)
-异常条目编号: 94, 184, 228, 360
