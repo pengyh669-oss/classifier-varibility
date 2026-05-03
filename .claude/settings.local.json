@@ -4,7 +4,8 @@
       "Bash(python -c ' *)",
       "mcp__ide__executeCode",
       "Bash(pip list *)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "PowerShell(npm update -g @anthropic-ai/claude-code)"
     ]
   }
 }
