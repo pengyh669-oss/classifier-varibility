@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "mcp__ide__executeCode",
+      "Bash(pip list *)",
+      "Bash(pip install *)"
     ]
   }
 }

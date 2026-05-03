@@ -26,7 +26,7 @@ DATA_SOURCES = {
 }
 
 DEFAULT_BASE_URL = "https://api.zhizengzeng.com/v1"
-DEFAULT_MODEL = "deepseek-v4-flash"
+DEFAULT_MODEL = "qwen2.5-vl-72b-instruct"
 DEFAULT_SEED = 20260406
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 90.0
 DEFAULT_REQUEST_RETRIES = 2

@@ -6,7 +6,7 @@ from llm_experiment_core import build_common_arg_parser, run_experiment
 
 
 FORMAL_COUNT = 360
-FORMAL_OUTPUT_FILE = "LLM_deepseek-v4-flash.txt"
+FORMAL_OUTPUT_FILE = "LLM_qwen2.5-vl-72b-instruct.txt"
 
 
 def main() -> None:
