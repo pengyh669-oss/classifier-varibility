@@ -26,7 +26,7 @@ DATA_SOURCES = {
 }
 
 DEFAULT_BASE_URL = "https://api.zhizengzeng.com/v1"
-DEFAULT_MODEL = "qwen2.5-vl-72b-instruct"
+DEFAULT_MODEL = "gemini-3.1-pro-preview"
 DEFAULT_SEED = 20260406
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 90.0
 DEFAULT_REQUEST_RETRIES = 2
@@ -96,13 +96,14 @@ class Question:
     unique_key: str
     source_file: str
     vg_object_id: str
+    question_id: str
     prompt: str
     image_url: str
     image_local_path: Path | None = None
     bbox_xywh: str = ""
 
-    def pseudo_filename(self, run_label: str, index: int) -> str:
-        return f"LLM_{run_label}_{self.source_file}_{self.vg_object_id}_{index:03d}"
+    def pseudo_filename(self, run_label: str) -> str:
+        return f"LLM_{run_label}_{self.source_file}_{self.vg_object_id}_{self.question_id}"
 
 
 def build_common_arg_parser(description: str) -> argparse.ArgumentParser:
@@ -236,17 +237,19 @@ def load_question_pool() -> list[Question]:
             prompt = _safe_str(row.get("prompt", ""))
             image_url = _safe_str(row.get("link_mn", ""))
             vg_object_id = _safe_str(row.get("vg_object_id", ""))
+            question_id = _safe_str(row.get("question_id", ""))
             bbox_xywh = _safe_str(row.get("bbox_xywh", ""))
 
             if not prompt:
                 continue
 
-            unique_key = f"{source_key}_{vg_object_id}_{row_index}"
+            unique_key = f"{source_key}_{question_id}_{row_index}"
             questions.append(
                 Question(
                     unique_key=unique_key,
                     source_file=source_key,
                     vg_object_id=vg_object_id or str(row_index),
+                    question_id=question_id or f"q_{row_index}",
                     prompt=prompt,
                     image_url=image_url,
                     image_local_path=build_local_image_path(
@@ -348,6 +351,7 @@ def call_llm_once(
             "3. 只根据红框内目标判断类别，忽略红框外内容。",
             "4. 不要补充颜色、位置、动作、用途等额外描述，除非原句本身要求。",
             "5. 若有多个可能答案，选择最短、最自然、不过度补充的答案。",
+            "6. 回答要与中文母语者的回答习惯一致。",
             "",
             "输出要求：",
             "只输出补全后的完整句子，不要解释，不要分析，不要输出多余内容。",
@@ -897,7 +901,7 @@ def run_experiment(
         if problems:
             anomaly_set.add(index)
 
-        lines.append(f"[{index}/{total_count}] 文件: {question.pseudo_filename(run_label, index)}")
+        lines.append(f"[{index}/{total_count}] 文件: {question.pseudo_filename(run_label)}")
         lines.append(_compose_transcript_line(sentence, llm_text))
         if reason:
             lines.append(f"备注: 模型未给出可用填空结果，原因：{reason}")
