@@ -7,10 +7,10 @@ from llm_experiment_core import build_common_arg_parser, run_experiment
 
 
 FORMAL_COUNT = 360
-FORMAL_OUTPUT_FILE = "LLM_gemini-3.1-pro-preview-new.txt"
+FORMAL_OUTPUT_FILE = "LLM_qwen2.5-vl-72b-instruct.txt"
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent if SCRIPT_DIR.name == "scripts" else SCRIPT_DIR
-FORMAL_OUTPUT_DIR = PROJECT_ROOT / "LLM_answer_new"
+FORMAL_OUTPUT_DIR = Path(r"E:\PythonProject\classifer-latest\LLM_answer_final")
 
 
 def main() -> None:

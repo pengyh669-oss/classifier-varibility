@@ -36,7 +36,7 @@ HEADERS = [
     "people_answer_calssifer",
     "LLM_answer_classifer_type",
     "people_answer_noun_type",
-    "MRR",
+    "RR",
     "people_answer__classifer_most",
     "people_answer_noun_most",
     "right_wrong",

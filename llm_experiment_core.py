@@ -26,7 +26,7 @@ DATA_SOURCES = {
 }
 
 DEFAULT_BASE_URL = "https://api.zhizengzeng.com/v1"
-DEFAULT_MODEL = "gemini-3.1-pro-preview"
+DEFAULT_MODEL = "qwen2.5-vl-72b-instruct"
 DEFAULT_SEED = 20260406
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 90.0
 DEFAULT_REQUEST_RETRIES = 2
@@ -126,7 +126,7 @@ def build_common_arg_parser(description: str) -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--output-dir",
-        default="translation/LLM_answer",
+        default=r"E:\PythonProject\classifer-latest\LLM_answer_final",
         help="Output folder for generated txt files.",
     )
     parser.add_argument(
@@ -352,6 +352,23 @@ def call_llm_once(
             "4. 不要补充颜色、位置、动作、用途等额外描述，除非原句本身要求。",
             "5. 若有多个可能答案，选择最短、最自然、不过度补充的答案。",
             "6. 回答要与中文母语者的回答习惯一致。",
+            "7. 母语者的补全习惯按以下规则理解：",
+            "   7.1 名词的具体程度分为三类：",
+            "       - 上位词：动物、植物、载具、家具、衣服、建筑、食物等大类词。",
+            "       - 普通词：猫、狗、鸟、车、椅子、花、房子、蛋糕等常用基本名词。",
+            "       - 下位词：波斯猫、金毛、公交车、办公椅、玫瑰花、摩天楼等更具体名词。",
+            "   7.2 补名词时，优先使用日常最常见、最自然的普通词；不要无依据地使用过细的下位词。",
+            "   7.3 若图片目标可以用普通词自然命名，优先使用普通词；只有当目标类别非常明确，且该下位词在中文中常用自然时，才使用下位词。",
+            "   7.4 若无法确定具体种类，使用普通词，不使用下位词。",
+            "   7.5 若原句已有特殊量词，如辆、张、把、栋、座、匹、头、条、件，应补与该量词自然搭配的名词，避免补动物、植物、载具、家具、食物等过宽泛上位词。",
+            "   7.6 若原句已有通用量词，如个、只，补名词时优先使用普通词，不要无依据地补过细下位词。",
+            "   7.7 补量词时，有生命目标，尤其是动物，优先使用“只”；不要轻易使用更专门的量词，除非该搭配非常固定自然。",
+            "   7.8 动物中的固定搭配可以使用特殊量词，例如一匹马、一头牛、一条鱼；其他动物通常用“一只”。",
+            "   7.9 补量词时，无生命目标若有稳定搭配，优先使用特殊量词，例如一辆车、一张桌子、一把椅子、一件衣服、一栋楼、一座建筑。",
+            "   7.10 无生命目标若没有稳定量词搭配，使用通用量词“个”。",
+            "   7.11 补“量词+名词”时，先选择最自然的名词，再选择该名词最自然搭配的量词；不要为了使用特殊量词而选择过细或不自然的名词。",
+            "   7.12 若特殊量词和通用量词都可以，选择更短、更常见、更符合日常口语的表达。",
+            "   7.13 总体优先级是：自然普通词 > 明确且常用的下位词 > 过宽泛的上位词；但如果原句已经限定了上位类别，只补缺失成分，不改变句子结构。",
             "",
             "输出要求：",
             "只输出补全后的完整句子，不要解释，不要分析，不要输出多余内容。",
@@ -359,13 +376,6 @@ def call_llm_once(
     )
     user_lines = [
         f"待补全句子：{question.prompt}",
-        "",
-        "请按以下规则补全：",
-        "1. “这是一___。” → 补全的内容中要包括“量词+名词”。",
-        "2. “这是一____动物/植物/载具/家具/衣服/建筑/食物。” → 只补量词。",
-        "3. “这是一个/只/头____。” → 只补名词。",
-        "4. 若原句已有量词，不再补量词；若已有名词或数词，不再补名词或数词。",
-        "5. 最终只输出补全后的完整句子。",
     ]
     if question.bbox_xywh:
         user_lines.append(f"红框坐标（x,y,w,h）：{question.bbox_xywh}")
@@ -710,8 +720,15 @@ def _one_line_text(text: str) -> str:
     return re.sub(r"\s*\n\s*", r"\\n", normalized).strip()
 
 
-def _compose_transcript_line(cleaned_sentence: str, raw_output: str) -> str:
-    return f"转录: {cleaned_sentence} | 原始输出: {_one_line_text(raw_output)}"
+def _compose_transcript_line(
+    cleaned_sentence: str,
+    raw_output: str,
+    elapsed_seconds: float,
+) -> str:
+    return (
+        f"转录: {cleaned_sentence} | 原始输出: {_one_line_text(raw_output)} "
+        f"| 单题时间: {elapsed_seconds:.2f}秒"
+    )
 
 
 def _split_transcript_payload(payload: str) -> tuple[str, str]:
@@ -902,7 +919,7 @@ def run_experiment(
             anomaly_set.add(index)
 
         lines.append(f"[{index}/{total_count}] 文件: {question.pseudo_filename(run_label)}")
-        lines.append(_compose_transcript_line(sentence, llm_text))
+        lines.append(_compose_transcript_line(sentence, llm_text, elapsed))
         if reason:
             lines.append(f"备注: 模型未给出可用填空结果，原因：{reason}")
         lines.append("-" * 60)
