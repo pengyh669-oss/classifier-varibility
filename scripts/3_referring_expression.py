@@ -17,7 +17,7 @@ pd.set_option("display.max_colwidth", None)
 # 1. 读取数据
 # =========================
 
-file_path = "classifier_2026.xlsx"
+file_path = "转录数据/classifier_2026_彭永恒.xlsx"
 
 sheets = pd.read_excel(file_path, sheet_name=None)
 

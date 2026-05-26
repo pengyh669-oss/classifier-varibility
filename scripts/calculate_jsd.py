@@ -55,8 +55,15 @@ FIELD_ROW_RANGES = {
     },
 }
 
+STANDALONE_FIELD_ROW_RANGES = {
+    "field-all.xlsx": (422, 601),
+    "field-live.xlsx": (212, 301),
+    "field-unlive.xlsx": (212, 301),
+}
+
 QUESTION_ID_COL = 1
 FIELD_LLM_QUANTIFIER_COL = 2
+FIELD_PEOPLE_QUANTIFIER_DISTRIBUTION_COL = 4
 DATA_QUESTION_ID_IDX = 1
 DATA_TASK_IDX = 3
 DATA_QUANTIFIER_IDX = 4
@@ -101,6 +108,30 @@ def jsd_from_counter_and_answer(people_counts: Counter[str], model_answer: str) 
     }
     jsd = 0.5 * kl_divergence(people_dist, midpoint) + 0.5 * kl_divergence(model_dist, midpoint)
     return round(jsd, 6)
+
+
+def parse_distribution_text(value: object) -> Counter[str]:
+    text = clean_cell(value)
+    counts: Counter[str] = Counter()
+    if not text:
+        return counts
+
+    for item in text.split(";"):
+        item = clean_cell(item)
+        if not item or ":" not in item:
+            continue
+        key, raw_count = item.rsplit(":", 1)
+        key = clean_cell(key)
+        raw_count = clean_cell(raw_count)
+        if not key:
+            continue
+        try:
+            count = int(float(raw_count))
+        except ValueError:
+            continue
+        if count > 0:
+            counts[key] += count
+    return counts
 
 
 def load_people_quantifier_counts(data_path: Path) -> dict[str, dict[str, Counter[str]]]:
@@ -169,6 +200,14 @@ def field_ranges_for_path(field_path: Path) -> dict[str, tuple[int, int]]:
     except KeyError as exc:
         known = ", ".join(sorted(FIELD_ROW_RANGES))
         raise ValueError(f"No configured row ranges for {field_path.name}. Known files: {known}") from exc
+
+
+def standalone_range_for_path(field_path: Path) -> tuple[int, int]:
+    try:
+        return STANDALONE_FIELD_ROW_RANGES[field_path.name]
+    except KeyError as exc:
+        known = ", ".join(sorted(STANDALONE_FIELD_ROW_RANGES))
+        raise ValueError(f"No configured standalone row range for {field_path.name}. Known files: {known}") from exc
 
 
 def calculate_field_jsd(
@@ -278,6 +317,98 @@ def write_field_jsd(
         workbook.close()
 
 
+def calculate_standalone_field_jsd(field_path: Path) -> dict[str, dict[str, int | float]]:
+    workbook = load_workbook(field_path, read_only=True, data_only=True)
+    try:
+        start_row, end_row = standalone_range_for_path(field_path)
+        stats: dict[str, dict[str, int | float]] = {}
+        for sheet_name in MODEL_SHEETS:
+            worksheet = workbook[sheet_name]
+            scores: list[float] = []
+            sheet_stats: dict[str, int | float] = {
+                "target_rows": 0,
+                "calculated": 0,
+                "missing_model": 0,
+                "missing_people": 0,
+                "mean_jsd": 0.0,
+            }
+            for row_idx in range(start_row, end_row + 1):
+                question_id = clean_cell(worksheet.cell(row=row_idx, column=QUESTION_ID_COL).value)
+                if not question_id:
+                    continue
+                sheet_stats["target_rows"] += 1
+                answer = clean_cell(worksheet.cell(row=row_idx, column=FIELD_LLM_QUANTIFIER_COL).value)
+                if not answer:
+                    sheet_stats["missing_model"] += 1
+                    continue
+                counts = parse_distribution_text(
+                    worksheet.cell(row=row_idx, column=FIELD_PEOPLE_QUANTIFIER_DISTRIBUTION_COL).value
+                )
+                if not counts:
+                    sheet_stats["missing_people"] += 1
+                    continue
+                score = jsd_from_counter_and_answer(counts, answer)
+                if score is None:
+                    continue
+                scores.append(score)
+                sheet_stats["calculated"] += 1
+            if scores:
+                sheet_stats["mean_jsd"] = round(sum(scores) / len(scores), 6)
+            stats[sheet_name] = sheet_stats
+        return stats
+    finally:
+        workbook.close()
+
+
+def write_standalone_field_jsd(field_path: Path) -> dict[str, dict[str, int | float]]:
+    workbook = load_workbook(field_path)
+    try:
+        start_row, end_row = standalone_range_for_path(field_path)
+        stats: dict[str, dict[str, int | float]] = {}
+        for sheet_name in MODEL_SHEETS:
+            worksheet = workbook[sheet_name]
+            jsd_col = get_or_create_jsd_column(worksheet)
+            scores: list[float] = []
+            sheet_stats: dict[str, int | float] = {
+                "target_rows": 0,
+                "written": 0,
+                "missing_model": 0,
+                "missing_people": 0,
+                "mean_jsd": 0.0,
+            }
+            for row_idx in range(start_row, end_row + 1):
+                question_id = clean_cell(worksheet.cell(row=row_idx, column=QUESTION_ID_COL).value)
+                if not question_id:
+                    continue
+                sheet_stats["target_rows"] += 1
+                answer = clean_cell(worksheet.cell(row=row_idx, column=FIELD_LLM_QUANTIFIER_COL).value)
+                counts = parse_distribution_text(
+                    worksheet.cell(row=row_idx, column=FIELD_PEOPLE_QUANTIFIER_DISTRIBUTION_COL).value
+                )
+                if not answer:
+                    sheet_stats["missing_model"] += 1
+                    worksheet.cell(row=row_idx, column=jsd_col, value=None)
+                    continue
+                if not counts:
+                    sheet_stats["missing_people"] += 1
+                    worksheet.cell(row=row_idx, column=jsd_col, value=None)
+                    continue
+                score = jsd_from_counter_and_answer(counts, answer)
+                if score is None:
+                    worksheet.cell(row=row_idx, column=jsd_col, value=None)
+                    continue
+                worksheet.cell(row=row_idx, column=jsd_col, value=score)
+                scores.append(score)
+                sheet_stats["written"] += 1
+            if scores:
+                sheet_stats["mean_jsd"] = round(sum(scores) / len(scores), 6)
+            stats[sheet_name] = sheet_stats
+        workbook.save(field_path)
+        return stats
+    finally:
+        workbook.close()
+
+
 def print_stats(field_path: Path, stats: dict[str, dict[str, dict[str, int | float]]], write: bool) -> None:
     action_key = "written" if write else "calculated"
     print(f"\n{field_path.name}")
@@ -295,6 +426,22 @@ def print_stats(field_path: Path, stats: dict[str, dict[str, dict[str, int | flo
             )
 
 
+def print_standalone_stats(field_path: Path, stats: dict[str, dict[str, int | float]], write: bool) -> None:
+    action_key = "written" if write else "calculated"
+    print(f"\n{field_path.name}")
+    print("  \u91cf\u8bcd\u56de\u7b54\u4efb\u52a1")
+    for sheet_name in MODEL_SHEETS:
+        sheet_stats = stats[sheet_name]
+        print(
+            f"    {sheet_name}: "
+            f"target_rows={sheet_stats['target_rows']}, "
+            f"{action_key}={sheet_stats[action_key]}, "
+            f"missing_model={sheet_stats['missing_model']}, "
+            f"missing_people={sheet_stats['missing_people']}, "
+            f"mean_jsd={sheet_stats['mean_jsd']}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Calculate JSD for Data quantifier and free-description quantifier rows in field workbooks."
@@ -308,11 +455,26 @@ def main() -> int:
         help="Field workbook to calculate. Can be passed multiple times. Defaults to field-all/live/unlive.",
     )
     parser.add_argument("--write", action="store_true", help="Write per-row JSD scores into selected field workbooks.")
+    parser.add_argument(
+        "--standalone-only",
+        action="store_true",
+        help="Only calculate standalone/no-image quantifier rows from field workbook columns B and D.",
+    )
     args = parser.parse_args()
+
+    field_paths = args.field if args.field else FIELD_RELATIVE_PATHS
+
+    if args.standalone_only:
+        for field_path in field_paths:
+            if args.write:
+                standalone_stats = write_standalone_field_jsd(field_path)
+            else:
+                standalone_stats = calculate_standalone_field_jsd(field_path)
+            print_standalone_stats(field_path, standalone_stats, args.write)
+        return 0
 
     people_counts = load_people_quantifier_counts(args.data)
     model_answers = load_model_quantifier_answers(args.data)
-    field_paths = args.field if args.field else FIELD_RELATIVE_PATHS
 
     for field_path in field_paths:
         if args.write:
