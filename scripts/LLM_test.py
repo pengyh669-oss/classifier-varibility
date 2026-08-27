@@ -1,29 +1,33 @@
 from __future__ import annotations
 
+from pathlib import Path
 import sys
 
 from scripts.llm_experiment_core import build_common_arg_parser, run_experiment
 
 
-PILOT_COUNT = 30
-PILOT_OUTPUT_FILE = "LLM_temp1_pilot.txt"
+FORMAL_COUNT = 360
+FORMAL_OUTPUT_FILE = "LLM_qwen2.5-vl-72b-instruct.txt"
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent if SCRIPT_DIR.name == "scripts" else SCRIPT_DIR
+FORMAL_OUTPUT_DIR = Path(r"E:\PythonProject\classifer-latest\LLM_answer_final")
 
 
 def main() -> None:
     parser = build_common_arg_parser(
-        "Pilot LLM experiment script (sample 30 questions)."
+        "Formal LLM experiment script (full 360 questions)."
     )
     args = parser.parse_args()
 
     try:
         code = run_experiment(
-            run_label="pilot",
-            total_count=PILOT_COUNT,
-            output_filename=PILOT_OUTPUT_FILE,
+            run_label="formal",
+            total_count=FORMAL_COUNT,
+            output_filename=FORMAL_OUTPUT_FILE,
             seed=args.seed,
             model=args.model,
             base_url=args.base_url,
-            output_dir=args.output_dir,
+            output_dir=str(FORMAL_OUTPUT_DIR),
             request_timeout=args.request_timeout,
             request_retries=args.request_retries,
             resume=args.resume,
